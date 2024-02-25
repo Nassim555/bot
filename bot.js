@@ -3,7 +3,7 @@ import { joinVoiceChannel } from "@discordjs/voice";
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 //console.log(process.env.token);
-const env = JSON.parse(process.env.token);
+const env = JSON.parse(process.env.TOKEN);
 client.on("ready", () => {
   const channel = client.channels.cache.get(env.channel_id);
   const connection = joinVoiceChannel({
