@@ -1,15 +1,17 @@
 import { Client, GatewayIntentBits } from "discord.js";
 import { joinVoiceChannel } from "@discordjs/voice";
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-client.login(
-  "MTA0NDcwMTYzMDg5NDk2NDg1Ng.G34ZkA.NEwIK64Pu0GZyylJFn2Cl5Mya-c8wJ2MSsXGK4",
-);
-client.on("ready", async () => {
-  const channel = await client.channels.cache.get("1171082008131276892");
+
+//console.log(process.env.token);
+const env = JSON.parse(process.env.token);
+client.on("ready", () => {
+  const channel = client.channels.cache.get(env.channel_id);
   const connection = joinVoiceChannel({
-    channelId: "1171082008131276892",
-    guildId: "861924870220152832",
+    channelId: channel.id,
+    guildId: channel.guild.id,
     adapterCreator: channel.guild.voiceAdapterCreator,
   });
-  console.log("ready to rock", channel);
+  console.log("ready");
 });
+
+client.login(env.token);
