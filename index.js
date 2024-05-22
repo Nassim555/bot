@@ -1,7 +1,7 @@
 require("dotenv").config();
 const { Client } = require("discord.js-selfbot-v13");
 const { joinVoiceChannel } = require("@discordjs/voice");
-
+const keep_alive = require(./keep-alive.js)
 const info = JSON.parse(process.env.token);
 const channel_id = info.id;
 function joinVc(client) {
