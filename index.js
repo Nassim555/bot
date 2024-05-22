@@ -13,6 +13,8 @@ function joinVc(client) {
       channelId: channel_id,
       guildId: channel.guildId,
       adapterCreator: channel.guild.voiceAdapterCreator,
+      selfMute: true,
+      selfDeaf: false,
     });
   });
 }
