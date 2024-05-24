@@ -1,8 +1,8 @@
 import "dotenv/config";
+import "./keep_alive.js"
 import { Client } from "discord.js-selfbot-v13";
 import { joinVoiceChannel } from "@discordjs/voice";
 import yn from "yn";
-import "./keep_alive.js"
 const token = process.env.TOKEN;
 const channelId = process.env.VC_ID;
 const selfMute = yn(process.env.SELF_MUTE, { default: false });
