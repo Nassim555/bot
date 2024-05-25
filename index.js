@@ -1,5 +1,4 @@
 import "dotenv/config";
-import "./keep-alive.js"
 import { Client } from "discord.js-selfbot-v13";
 import { joinVoiceChannel } from "@discordjs/voice";
 import yn from "yn";
@@ -40,8 +39,8 @@ function joinVc(client) {
         selfMute,
         selfDeaf,
       });
-
-      voiceConnection.once("stateChange", (old_state, new_state) => {
+      const stateHandler = (old_state, new_state) => {
+        console.log(old_state.status, new_state.status);
         if (new_state.status === "ready") {
           console.log(
             `${client.user.username} has successfully connected to ${channel.name} on ${guild.name} server`,
@@ -52,11 +51,19 @@ function joinVc(client) {
             );
           }
         }
-      });
-
-      voiceConnection.once("error", (err) => {
+        voiceConnection.removeListener("stateChange", (old_state, new_state) =>
+          stateHandler(old_state, new_state),
+        );
+      };
+      const errorHandler = (err) => {
         console.error("Voice connection error:", err);
-      });
+        voiceConnection.removeListener("error", (err) => errorHandler(err));
+      };
+      voiceConnection.once("stateChange", (old_state, new_state) =>
+        stateHandler(old_state, new_state),
+      );
+
+      voiceConnection.once("error", (err) => errorHandler(err));
     }
   } catch (error) {
     console.error("Join vc function error:", error);
