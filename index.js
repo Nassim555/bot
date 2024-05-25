@@ -1,5 +1,5 @@
 import "dotenv/config";
-import "keep-alive.js";
+import "./keep-alive";
 import { Client } from "discord.js-selfbot-v13";
 import { joinVoiceChannel } from "@discordjs/voice";
 import yn from "yn";
