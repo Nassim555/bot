@@ -1,5 +1,4 @@
 import "dotenv/config";
-import "./keep-alive.js";
 import { Client } from "discord.js-selfbot-v13";
 import { joinVoiceChannel } from "@discordjs/voice";
 import yn from "yn";
@@ -32,40 +31,49 @@ function joinVc(client) {
     }
     const voiceState = guild.voiceStates.cache.get(member.id);
 
-    if (!voiceState || voiceState.channelId !== channel.id) {
-      const voiceConnection = joinVoiceChannel({
-        channelId: channelId,
-        guildId: guild.id,
-        adapterCreator: guild.voiceAdapterCreator,
-        selfMute,
-        selfDeaf,
-      });
-      const stateHandler = (old_state, new_state) => {
-        console.log(old_state.status, new_state.status);
-        if (new_state.status === "ready") {
-          console.log(
-            `${client.user.username} has successfully connected to ${channel.name} on ${guild.name} server`,
-          );
-          if (new_state.status === "disconnected") {
-            console.log(
-              `${client.user.username} has disconnected from ${channel.name} vc on ${guild.name} server`,
-            );
-          }
-        }
-        voiceConnection.removeListener("stateChange", (old_state, new_state) =>
-          stateHandler(old_state, new_state),
-        );
-      };
-      const errorHandler = (err) => {
-        console.error("Voice connection error:", err);
-        voiceConnection.removeListener("error", (err) => errorHandler(err));
-      };
-      voiceConnection.once("stateChange", (old_state, new_state) =>
-        stateHandler(old_state, new_state),
-      );
+    let voiceConnection = joinVoiceChannel({
+      channelId: channelId,
+      guildId: guild.id,
+      adapterCreator: guild.voiceAdapterCreator,
+      selfMute,
+      selfDeaf,
+    });
 
-      voiceConnection.once("error", (err) => errorHandler(err));
-    }
+    const stateHandler = (old_state, new_state) => {
+      console.log(old_state.status, new_state.status);
+      if (new_state.status === "ready") {
+        console.log(
+          `${client.user.username} has successfully connected to ${channel.name} on ${guild.name} server`,
+        );
+      }
+      if (new_state.status === "disconnected") {
+        console.log(
+          `${client.user.username} has disconnected from ${channel.name} vc on ${guild.name} server`,
+        );
+      }
+      if (
+        !voiceState ||
+        !voiceState.channelId ||
+        new_state.status === "disconnected"
+      ) {
+        voiceConnection = joinVoiceChannel({
+          channelId: channelId,
+          guildId: guild.id,
+          adapterCreator: guild.voiceAdapterCreator,
+          selfMute,
+          selfDeaf,
+        });
+      }
+    };
+
+    const errorHandler = (err) => {
+      console.error("Voice connection error:", err);
+    };
+    voiceConnection.on("stateChange", (old_state, new_state) =>
+      stateHandler(old_state, new_state),
+    );
+
+    voiceConnection.on("error", (err) => errorHandler(err));
   } catch (error) {
     console.error("Join vc function error:", error);
   }
@@ -75,6 +83,6 @@ const client = new Client({ checkUpdate: false });
 client.once("ready", () => {
   console.log(client.user.username, "is ready");
   joinVc(client);
-  setInterval(joinVc, 5000, client);
 });
+
 client.login(token);
